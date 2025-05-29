@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useActionState, useFormStatus } from "react-dom"; // useFormStatus is still from react-dom
+import { useActionState } from "react"; // Corrected: useActionState is from 'react'
+import { useFormStatus } from "react-dom"; // useFormStatus is still from react-dom
 import { useEffect, useState } from "react";
 import { saveAppointmentAction, type SaveAppointmentActionState } from "./actions";
 import { Label } from "@/components/ui/label";
@@ -36,16 +37,10 @@ function SubmitButton() {
 }
 
 export function AppointmentForm() {
-  // Changed from useFormState to useActionState, import source is React by convention (though react-dom also re-exports it)
-  // For clarity and future-proofing, let's explicitly import useActionState from 'react' if it's available there,
-  // but the error says React.useActionState, and useFormState was from 'react-dom'.
-  // The migration path often involves changing the import from 'react-dom' to 'react' for useActionState.
-  // Let's adjust the import at the top.
   const [state, formAction] = useActionState(saveAppointmentAction, initialState);
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    // @ts-ignore - state.formData might not exist initially, which is fine.
-    state.formData?.appointmentDate ? new Date(state.formData.appointmentDate) : undefined
+    state.formData?.dateTime ? new Date(state.formData.dateTime.split('T')[0]) : undefined
   );
 
   useEffect(() => {
@@ -53,7 +48,6 @@ export function AppointmentForm() {
       toast({
         variant: "destructive",
         title: "Error",
-        // @ts-ignore
         description: state.error,
       });
     }
@@ -65,11 +59,16 @@ export function AppointmentForm() {
       });
       // Optionally reset form or redirect here
       setSelectedDate(undefined); // Reset date picker
+      // Consider resetting other form fields if needed by re-initializing state or using form.reset() if using react-hook-form directly
     }
   }, [state.error, state.successMessage, toast]);
 
   // Correctly handle potential undefined state.formData.dateTime for splitting
   const defaultTime = state.formData?.dateTime ? state.formData.dateTime.split('T')[1] : "";
+  const defaultClientName = state.formData?.clientName || "";
+  const defaultServiceDescription = state.formData?.serviceDescription || "";
+  const defaultNotes = state.formData?.notes || "";
+
 
   return (
     <Card className="shadow-xl">
@@ -87,8 +86,7 @@ export function AppointmentForm() {
               id="clientName"
               name="clientName"
               placeholder="e.g., Airi Tanaka"
-              // @ts-ignore
-              defaultValue={state.formData?.clientName}
+              defaultValue={defaultClientName}
               required
             />
           </div>
@@ -98,8 +96,7 @@ export function AppointmentForm() {
               id="serviceDescription"
               name="serviceDescription"
               placeholder="e.g., Full Color Analysis"
-              // @ts-ignore
-              defaultValue={state.formData?.serviceDescription}
+              defaultValue={defaultServiceDescription}
               required
             />
           </div>
@@ -138,7 +135,6 @@ export function AppointmentForm() {
                 id="appointmentTime"
                 name="appointmentTime"
                 type="time"
-                // @ts-ignore
                 defaultValue={defaultTime}
                 required
               />
@@ -150,8 +146,7 @@ export function AppointmentForm() {
               id="notes"
               name="notes"
               placeholder="e.g., Client prefers morning appointments, specific requests."
-              // @ts-ignore
-              defaultValue={state.formData?.notes}
+              defaultValue={defaultNotes}
               rows={3}
             />
           </div>
@@ -168,9 +163,9 @@ export function AppointmentForm() {
           <AlertDescription>
             {state.successMessage}
             {state.calendarEvent?.calendarLink && (
-              <a 
-                href={state.calendarEvent.calendarLink} 
-                target="_blank" 
+              <a
+                href={state.calendarEvent.calendarLink}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="block mt-2 text-sm font-medium text-primary hover:underline"
               >
@@ -185,7 +180,6 @@ export function AppointmentForm() {
           <AlertCircle className="h-5 w-5" />
           <AlertTitle>Save Failed</AlertTitle>
           <AlertDescription>
-            {/* @ts-ignore */}
             {state.error}
           </AlertDescription>
         </Alert>
