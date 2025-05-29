@@ -1,10 +1,10 @@
 
 "use client";
 
-import { useActionState } from "react"; 
-import { useFormStatus } from "react-dom"; 
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { useEffect, useState } from "react";
-import { saveAppointmentAction, type SaveAppointmentActionState } from "./actions";
+import { saveAppointmentAction, type SaveAppointmentActionState, type FormDataType } from "./actions";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,36 +47,37 @@ function SubmitButton() {
 export function AppointmentForm() {
   const [state, formAction] = useActionState(saveAppointmentAction, initialState);
   const { toast } = useToast();
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    state.formData?.appointmentDate ? new Date(state.formData.appointmentDate + 'T00:00:00') : undefined // Ensure correct date parsing
-  );
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => {
+    if (state.formData?.appointmentDate) {
+      // Ensure correct parsing, assuming YYYY-MM-DD format from form state
+      const parts = state.formData.appointmentDate.split('-');
+      if (parts.length === 3) {
+        return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      }
+    }
+    return undefined;
+  });
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   useEffect(() => {
-    if (state.error && !state.successMessage) { 
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: state.error,
-      });
-    }
     if (state.successMessage) {
       toast({
         title: "Success",
         description: state.successMessage,
         variant: "default",
       });
-      setSelectedDate(undefined); 
-      // For a full form reset, you might need to manage form field values with useState and reset them here,
-      // or re-key the form component. For now, clearing selectedDate is a partial reset.
-      // The form inputs with `defaultValue` will reset if the component re-renders with a cleared `state.formData`.
+      setSelectedDate(undefined);
+      // Consider a full form reset here if needed, e.g., by re-keying the form or resetting state.formData in `saveAppointmentAction`
     }
-  }, [state.error, state.successMessage, toast]);
+  }, [state.successMessage, toast]);
 
-  const defaultTime = state.formData?.appointmentTime || "";
+  // Default values from state.formData (if present, e.g., after an error) or empty
   const defaultClientName = state.formData?.clientName || "";
-  const defaultClientEmail = state.formData?.clientEmail || ""; // Changed this line
+  const defaultClientEmail = state.formData?.clientEmail || "";
   const defaultServiceDescription = state.formData?.serviceDescription || "";
+  const defaultAppointmentTime = state.formData?.appointmentTime || "";
   const defaultNotes = state.formData?.notes || "";
+
 
   return (
     <Card className="shadow-xl">
@@ -133,7 +134,7 @@ export function AppointmentForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="appointmentDate">Appointment Date</Label>
-              <Popover>
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant={"outline"}
@@ -152,13 +153,14 @@ export function AppointmentForm() {
                     selected={selectedDate}
                     onSelect={(date) => {
                       setSelectedDate(date);
+                      setIsCalendarOpen(false); // Close popover on date select
                     }}
                     initialFocus
                     disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))} // Disable past dates
                   />
                 </PopoverContent>
               </Popover>
-              <input type="hidden" name="appointmentDate" value={selectedDate ? selectedDate.toISOString().split('T')[0] : ""} />
+              <input type="hidden" name="appointmentDate" value={selectedDate ? format(selectedDate, "yyyy-MM-dd") : ""} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="appointmentTime">Appointment Time</Label>
@@ -166,7 +168,7 @@ export function AppointmentForm() {
                 id="appointmentTime"
                 name="appointmentTime"
                 type="time"
-                defaultValue={defaultTime}
+                defaultValue={defaultAppointmentTime}
                 required
               />
             </div>
@@ -206,7 +208,7 @@ export function AppointmentForm() {
           </AlertDescription>
         </Alert>
       )}
-       {state.error && !state.successMessage && (
+       {state.error && !state.successMessage && ( // Only show if there's an error AND no success message
          <Alert variant="destructive" className="m-6">
           <AlertCircle className="h-5 w-5" />
           <AlertTitle>Save Failed</AlertTitle>
