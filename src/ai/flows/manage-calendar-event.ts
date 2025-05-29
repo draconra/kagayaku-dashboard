@@ -3,7 +3,8 @@
 /**
  * @fileOverview Manages Google Calendar events for appointments.
  *
- * - manageCalendarEvent - Creates or updates a Google Calendar event.
+ * - manageCalendarEvent - Creates or updates a Google Calendar event on kagayakustudio2024@gmail.com's calendar,
+ *   inviting the client and hudajamilah.consulting@gmail.com as attendees.
  * - ManageCalendarEventInput - The input type for the flow.
  * - ManageCalendarEventOutput - The return type for the flow.
  */
@@ -13,7 +14,7 @@ import {z} from 'genkit';
 
 const ManageCalendarEventInputSchema = z.object({
   clientName: z.string().describe('The name of the client for the appointment.'),
-  clientEmail: z.string().email().describe('The email address of the client.'),
+  clientEmail: z.string().email().describe('The email address of the client, who will be invited to the event.'),
   serviceDescription: z.string().describe('A description of the service for the appointment.'),
   dateTime: z.string().datetime().describe('The date and time of the appointment in ISO 8601 format (e.g., "2024-07-15T10:00:00").'),
   notes: z.string().optional().describe('Optional notes for the appointment.'),
@@ -47,35 +48,39 @@ const manageCalendarEventFlow = ai.defineFlow(
   async (input: ManageCalendarEventInput): Promise<ManageCalendarEventOutput> => {
     console.log("Received input for manageCalendarEventFlow:", input);
     const studioCalendarId = "kagayakustudio2024@gmail.com";
+    const additionalAttendee = "hudajamilah.consulting@gmail.com";
 
     // TODO: Implement Google Calendar API interaction here for calendar: ${studioCalendarId}.
     // 1. Authenticate with Google Calendar API (OAuth2.0 for kagayakustudio2024@gmail.com).
     // 2. If input.existingEventId is provided, update the existing event.
     //    - Include input.clientEmail as an attendee.
+    //    - Include additionalAttendee (hudajamilah.consulting@gmail.com) as an attendee.
     // 3. Otherwise, create a new event.
-    //    - Set summary, start/end times, description (from input.notes), and add input.clientEmail as an attendee.
+    //    - Set summary, start/end times, description (from input.notes).
+    //    - Add input.clientEmail as an attendee.
+    //    - Add additionalAttendee (hudajamilah.consulting@gmail.com) as an attendee.
     // 4. Construct the event details (summary, start time, end time, description, attendees etc.)
     //    from the input. For end time, you might assume a default duration (e.g., 1 hour).
 
     // Placeholder logic:
     if (input.existingEventId) {
       // Simulate updating an event
-      console.log(`Simulating update for event ID: ${input.existingEventId} on calendar ${studioCalendarId} for client ${input.clientEmail}`);
+      console.log(`Simulating update for event ID: ${input.existingEventId} on calendar ${studioCalendarId}. Attendees to include: ${input.clientEmail}, ${additionalAttendee}`);
       return {
         success: true,
         eventId: input.existingEventId,
         calendarLink: `https://calendar.google.com/calendar/event?eid=${Buffer.from(input.existingEventId).toString('base64')}`, 
-        message: `Successfully updated appointment for ${input.clientName} (${input.clientEmail}) on calendar ${studioCalendarId} (Placeholder).`,
+        message: `Successfully updated appointment for ${input.clientName} on calendar ${studioCalendarId}. Invitations would be sent to ${input.clientEmail} and ${additionalAttendee} (Placeholder).`,
       };
     } else {
       // Simulate creating a new event
       const newEventId = `evt-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-      console.log(`Simulating creation of new event for: ${input.clientName} (${input.clientEmail}) on calendar ${studioCalendarId}`);
+      console.log(`Simulating creation of new event for: ${input.clientName} on calendar ${studioCalendarId}. Attendees to include: ${input.clientEmail}, ${additionalAttendee}`);
       return {
         success: true,
         eventId: newEventId,
         calendarLink: `https://calendar.google.com/calendar/event?eid=${Buffer.from(newEventId).toString('base64')}`,
-        message: `Successfully created new appointment for ${input.clientName} (${input.clientEmail}) on calendar ${studioCalendarId} (Placeholder). Client email: ${input.clientEmail}.`,
+        message: `Successfully created new appointment for ${input.clientName} on calendar ${studioCalendarId}. Invitations would be sent to ${input.clientEmail} and ${additionalAttendee} (Placeholder).`,
       };
     }
     
@@ -86,3 +91,4 @@ const manageCalendarEventFlow = ai.defineFlow(
     // };
   }
 );
+
