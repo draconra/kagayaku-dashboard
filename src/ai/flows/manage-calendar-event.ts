@@ -13,6 +13,7 @@ import {z} from 'genkit';
 
 const ManageCalendarEventInputSchema = z.object({
   clientName: z.string().describe('The name of the client for the appointment.'),
+  clientEmail: z.string().email().describe('The email address of the client.'),
   serviceDescription: z.string().describe('A description of the service for the appointment.'),
   dateTime: z.string().datetime().describe('The date and time of the appointment in ISO 8601 format (e.g., "2024-07-15T10:00:00").'),
   notes: z.string().optional().describe('Optional notes for the appointment.'),
@@ -34,7 +35,7 @@ export async function manageCalendarEvent(input: ManageCalendarEventInput): Prom
 }
 
 // Placeholder Genkit Flow for Google Calendar Integration
-// In a real application, this flow would use the Google Calendar API.
+// In a real application, this flow would use the Google Calendar API to interact with kagayakustudio2024@gmail.com's calendar.
 // This requires setting up OAuth 2.0 authentication and using a client library like 'googleapis'.
 // The 'ai.defineFlow' would call a function that handles these API interactions.
 const manageCalendarEventFlow = ai.defineFlow(
@@ -45,35 +46,36 @@ const manageCalendarEventFlow = ai.defineFlow(
   },
   async (input: ManageCalendarEventInput): Promise<ManageCalendarEventOutput> => {
     console.log("Received input for manageCalendarEventFlow:", input);
+    const studioCalendarId = "kagayakustudio2024@gmail.com";
 
-    // TODO: Implement Google Calendar API interaction here.
-    // 1. Authenticate with Google Calendar API (OAuth2.0).
-    //    - This is a complex step usually handled outside the direct flow logic,
-    //      involving configuration and token management.
+    // TODO: Implement Google Calendar API interaction here for calendar: ${studioCalendarId}.
+    // 1. Authenticate with Google Calendar API (OAuth2.0 for kagayakustudio2024@gmail.com).
     // 2. If input.existingEventId is provided, update the existing event.
+    //    - Include input.clientEmail as an attendee.
     // 3. Otherwise, create a new event.
-    // 4. Construct the event details (summary, start time, end time, description, etc.)
+    //    - Set summary, start/end times, description (from input.notes), and add input.clientEmail as an attendee.
+    // 4. Construct the event details (summary, start time, end time, description, attendees etc.)
     //    from the input. For end time, you might assume a default duration (e.g., 1 hour).
 
     // Placeholder logic:
     if (input.existingEventId) {
       // Simulate updating an event
-      console.log(`Simulating update for event ID: ${input.existingEventId}`);
+      console.log(`Simulating update for event ID: ${input.existingEventId} on calendar ${studioCalendarId} for client ${input.clientEmail}`);
       return {
         success: true,
         eventId: input.existingEventId,
-        calendarLink: `https://calendar.google.com/calendar/event?eid=${Buffer.from(input.existingEventId).toString('base64')}`, // Example link
-        message: `Successfully updated appointment for ${input.clientName} (Placeholder).`,
+        calendarLink: `https://calendar.google.com/calendar/event?eid=${Buffer.from(input.existingEventId).toString('base64')}`, 
+        message: `Successfully updated appointment for ${input.clientName} (${input.clientEmail}) on calendar ${studioCalendarId} (Placeholder).`,
       };
     } else {
       // Simulate creating a new event
       const newEventId = `evt-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-      console.log(`Simulating creation of new event for: ${input.clientName}`);
+      console.log(`Simulating creation of new event for: ${input.clientName} (${input.clientEmail}) on calendar ${studioCalendarId}`);
       return {
         success: true,
         eventId: newEventId,
-        calendarLink: `https://calendar.google.com/calendar/event?eid=${Buffer.from(newEventId).toString('base64')}`, // Example link
-        message: `Successfully created new appointment for ${input.clientName} (Placeholder).`,
+        calendarLink: `https://calendar.google.com/calendar/event?eid=${Buffer.from(newEventId).toString('base64')}`,
+        message: `Successfully created new appointment for ${input.clientName} (${input.clientEmail}) on calendar ${studioCalendarId} (Placeholder). Client email: ${input.clientEmail}.`,
       };
     }
     

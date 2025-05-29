@@ -7,6 +7,7 @@ import { z } from "zod";
 
 const SaveAppointmentActionInputSchema = z.object({
   clientName: z.string().min(1, "Client name is required."),
+  clientEmail: z.string().email("Invalid email address.").min(1, "Client email is required."),
   serviceDescription: z.string().min(1, "Service description is required."),
   appointmentDate: z.string().min(1, "Appointment date is required."), // ISO date string yyyy-mm-dd
   appointmentTime: z.string().min(1, "Appointment time is required."), // HH:mm
@@ -14,8 +15,15 @@ const SaveAppointmentActionInputSchema = z.object({
   existingEventId: z.string().optional(), // For editing existing events
 });
 
+// Derive a type for formData based on ManageCalendarEventInput but also matching form fields
+export type FormDataType = Omit<ManageCalendarEventInput, 'dateTime'> & {
+    appointmentDate?: string;
+    appointmentTime?: string;
+    clientEmail: string; // Ensure clientEmail is part of this type
+};
+
 export type SaveAppointmentActionState = {
-  formData?: ManageCalendarEventInput; // Using flow input type here
+  formData?: FormDataType; 
   error?: string;
   successMessage?: string;
   calendarEvent?: ManageCalendarEventOutput;
@@ -30,11 +38,12 @@ export async function saveAppointmentAction(
   const validatedFields = SaveAppointmentActionInputSchema.safeParse(rawFormData);
 
   if (!validatedFields.success) {
-    // Reconstruct ManageCalendarEventInput for formData to match expected type in form
-    const typedFormData: ManageCalendarEventInput = {
+    const typedFormData: FormDataType = {
         clientName: rawFormData.clientName as string || "",
+        clientEmail: rawFormData.clientEmail as string || "",
         serviceDescription: rawFormData.serviceDescription as string || "",
-        dateTime: `${rawFormData.appointmentDate as string}T${rawFormData.appointmentTime as string}`, // Combine date and time
+        appointmentDate: rawFormData.appointmentDate as string || "",
+        appointmentTime: rawFormData.appointmentTime as string || "",
         notes: rawFormData.notes as string | undefined,
         existingEventId: rawFormData.existingEventId as string | undefined,
     };
@@ -50,29 +59,40 @@ export async function saveAppointmentAction(
   const combinedDateTime = `${appointmentDate}T${appointmentTime}`;
 
   const flowInput: ManageCalendarEventInput = {
-    ...restOfData,
+    ...restOfData, // clientName, clientEmail, serviceDescription, notes, existingEventId
     dateTime: combinedDateTime,
   };
 
   try {
-    const result = await manageCalendarEvent(flowInput); // Changed from manageCalendarEventFlow
+    const result = await manageCalendarEvent(flowInput);
     if (result.success) {
       return { 
         successMessage: result.message || "Appointment saved successfully and Google Calendar event managed.",
         calendarEvent: result 
       };
     } else {
+      // Reconstruct FormDataType for formData to match expected type in form
+      const errorFormData: FormDataType = {
+        ...restOfData,
+        appointmentDate,
+        appointmentTime,
+      };
       return {
-        formData: flowInput,
+        formData: errorFormData,
         error: result.message || "Failed to manage Google Calendar event.",
       };
     }
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : "An unknown error occurred.";
+    // Reconstruct FormDataType for formData
+    const errorFormData: FormDataType = {
+        ...restOfData,
+        appointmentDate,
+        appointmentTime,
+    };
     return {
-      formData: flowInput,
+      formData: errorFormData,
       error: `Action failed: ${errorMessage}`,
     };
   }
 }
-

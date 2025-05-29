@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { CalendarIcon, Loader2, CheckCircle2, AlertCircle, Mail } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -48,7 +48,7 @@ export function AppointmentForm() {
   const [state, formAction] = useActionState(saveAppointmentAction, initialState);
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    state.formData?.dateTime ? new Date(state.formData.dateTime.split('T')[0] + 'T00:00:00') : undefined // Ensure date is parsed correctly, add T00:00:00 to avoid timezone issues with just date string
+    state.formData?.dateTime ? new Date(state.formData.dateTime.split('T')[0] + 'T00:00:00') : undefined
   );
 
   useEffect(() => {
@@ -66,18 +66,16 @@ export function AppointmentForm() {
         variant: "default",
       });
       setSelectedDate(undefined); 
-      // Consider resetting other form fields by re-initializing state or using form.reset()
-      // For a controlled component approach (not used here directly with useActionState's form data handling),
-      // you would clear the state variables tied to each input.
-      // Since form data is largely driven by `defaultValue` from `state.formData`,
-      // a full reset would ideally mean clearing `state.formData` or resetting the action state,
-      // which useActionState doesn't directly provide a reset for in the component itself.
-      // A common pattern is to redirect or re-key the form component to force a full remount.
+      // Note: For a full form reset after successful submission with useActionState,
+      // you might need to re-key the form component or manage input values more directly
+      // if defaultValues alone aren't clearing as expected on subsequent submissions without a page reload.
+      // For now, clearing selectedDate is a partial reset.
     }
   }, [state.error, state.successMessage, toast]);
 
   const defaultTime = state.formData?.dateTime ? state.formData.dateTime.split('T')[1] : "";
   const defaultClientName = state.formData?.clientName || "";
+  const defaultClientEmail = state.formData?.clientEmail || "hudajamilah.consulting@gmail.com";
   const defaultServiceDescription = state.formData?.serviceDescription || "";
   const defaultNotes = state.formData?.notes || "";
 
@@ -86,20 +84,37 @@ export function AppointmentForm() {
       <CardHeader>
         <CardTitle>Appointment Details</CardTitle>
         <CardDescription>
-          Enter the client and service information for the new appointment.
+          Enter the client and service information for the new appointment. This will also create an event in Google Calendar for kagayakustudio2024@gmail.com.
         </CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="clientName">Client Name</Label>
-            <Input
-              id="clientName"
-              name="clientName"
-              placeholder="e.g., Airi Tanaka"
-              defaultValue={defaultClientName}
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="clientName">Client Name</Label>
+              <Input
+                id="clientName"
+                name="clientName"
+                placeholder="e.g., Airi Tanaka"
+                defaultValue={defaultClientName}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="clientEmail">Client Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="clientEmail"
+                  name="clientEmail"
+                  type="email"
+                  placeholder="e.g., airi.tanaka@example.com"
+                  defaultValue={defaultClientEmail}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="serviceDescription">Service Description</Label>
