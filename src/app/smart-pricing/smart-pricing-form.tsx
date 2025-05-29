@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
@@ -77,12 +78,12 @@ export function SmartPricingForm() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="currentPrice">Current Price (USD)</Label>
+              <Label htmlFor="currentPrice">Current Price (IDR)</Label>
               <Input
                 id="currentPrice"
                 name="currentPrice"
                 type="number"
-                placeholder="e.g., 150"
+                placeholder="e.g., 1500000"
                 defaultValue={state.formData?.currentPrice}
                 required
               />
@@ -111,7 +112,7 @@ export function SmartPricingForm() {
           <AlertTitle className="font-semibold text-green-600 dark:text-green-300">AI Pricing Suggestion</AlertTitle>
           <AlertDescription>
             <p className="text-2xl font-bold mt-2 mb-1">
-              Suggested Price: ${state.suggestion.suggestedPrice.toFixed(2)}
+              Suggested Price: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.suggestion.suggestedPrice)}
             </p>
             <p className="text-sm">{state.suggestion.reasoning}</p>
           </AlertDescription>

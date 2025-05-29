@@ -1,3 +1,4 @@
+
 "use client"; // This component uses Recharts which is client-side
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -5,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { DollarSign, TrendingUp, TrendingDown } from "lucide-react";
 
 const financialData = {
-  revenue: 7850,
-  expenses: 2340,
+  revenue: 78500000, // Assuming example value in IDR
+  expenses: 23400000, // Assuming example value in IDR
 };
 const netProfit = financialData.revenue - financialData.expenses;
 
@@ -18,7 +19,7 @@ const chartData = [
 
 // Helper to format currency
 const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 };
 
 export function FinancialSnapshot() {
@@ -29,7 +30,7 @@ export function FinancialSnapshot() {
           <DollarSign className="w-6 h-6 text-primary" />
           Financial Snapshot
         </CardTitle>
-        <CardDescription>Summary for the current period.</CardDescription>
+        <CardDescription>Summary for the current period (in IDR).</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3 mb-6">
@@ -58,7 +59,12 @@ export function FinancialSnapshot() {
             <BarChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="name" stroke="hsl(var(--foreground))" fontSize={12} />
-              <YAxis stroke="hsl(var(--foreground))" fontSize={12} tickFormatter={(value) => `$${value/1000}k`} />
+              <YAxis 
+                stroke="hsl(var(--foreground))" 
+                fontSize={12} 
+                tickFormatter={(value) => \`Rp\${value/1000000}jt\`} 
+                label={{ value: '(in millions IDR)', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))', fontSize:10, dy: 40 }}
+              />
               <Tooltip
                 cursor={{ fill: "hsl(var(--accent) / 0.3)" }}
                 contentStyle={{ 
@@ -68,6 +74,7 @@ export function FinancialSnapshot() {
                 }}
                 labelStyle={{ color: "hsl(var(--foreground))" }}
                 itemStyle={{ color: "hsl(var(--foreground))" }}
+                formatter={(value: number) => formatCurrency(value)}
               />
               <Bar dataKey="value" radius={[4, 4, 0, 0]} />
             </BarChart>
