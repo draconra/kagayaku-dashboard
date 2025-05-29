@@ -48,7 +48,7 @@ export function AppointmentForm() {
   const [state, formAction] = useActionState(saveAppointmentAction, initialState);
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    state.formData?.dateTime ? new Date(state.formData.dateTime.split('T')[0] + 'T00:00:00') : undefined
+    state.formData?.appointmentDate ? new Date(state.formData.appointmentDate + 'T00:00:00') : undefined // Ensure correct date parsing
   );
 
   useEffect(() => {
@@ -66,16 +66,15 @@ export function AppointmentForm() {
         variant: "default",
       });
       setSelectedDate(undefined); 
-      // Note: For a full form reset after successful submission with useActionState,
-      // you might need to re-key the form component or manage input values more directly
-      // if defaultValues alone aren't clearing as expected on subsequent submissions without a page reload.
-      // For now, clearing selectedDate is a partial reset.
+      // For a full form reset, you might need to manage form field values with useState and reset them here,
+      // or re-key the form component. For now, clearing selectedDate is a partial reset.
+      // The form inputs with `defaultValue` will reset if the component re-renders with a cleared `state.formData`.
     }
   }, [state.error, state.successMessage, toast]);
 
-  const defaultTime = state.formData?.dateTime ? state.formData.dateTime.split('T')[1] : "";
+  const defaultTime = state.formData?.appointmentTime || "";
   const defaultClientName = state.formData?.clientName || "";
-  const defaultClientEmail = state.formData?.clientEmail || "hudajamilah.consulting@gmail.com";
+  const defaultClientEmail = state.formData?.clientEmail || ""; // Changed this line
   const defaultServiceDescription = state.formData?.serviceDescription || "";
   const defaultNotes = state.formData?.notes || "";
 
@@ -84,7 +83,7 @@ export function AppointmentForm() {
       <CardHeader>
         <CardTitle>Appointment Details</CardTitle>
         <CardDescription>
-          Enter the client and service information for the new appointment. This will also create an event in Google Calendar for kagayakustudio2024@gmail.com.
+          Enter the client and service information for the new appointment. This will also create an event in Google Calendar for kagayakustudio2024@gmail.com, inviting the client and hudajamilah.consulting@gmail.com.
         </CardDescription>
       </CardHeader>
       <form action={formAction}>
