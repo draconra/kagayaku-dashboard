@@ -62,18 +62,18 @@ export const manageCalendarEventFlow = ai.defineFlow(
       return {
         success: true,
         eventId: input.existingEventId,
-        calendarLink: \`https://calendar.google.com/calendar/event?eid=\${Buffer.from(input.existingEventId).toString('base64')}\`, // Example link
-        message: \`Successfully updated appointment for \${input.clientName} (Placeholder).\`,
+        calendarLink: `https://calendar.google.com/calendar/event?eid=${Buffer.from(input.existingEventId).toString('base64')}`, // Example link
+        message: `Successfully updated appointment for ${input.clientName} (Placeholder).`,
       };
     } else {
       // Simulate creating a new event
-      const newEventId = \`evt-\${Date.now()}-\${Math.random().toString(36).substring(2, 9)}\`;
-      console.log(`Simulating creation of new event for: \${input.clientName}`);
+      const newEventId = `evt-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      console.log(`Simulating creation of new event for: ${input.clientName}`);
       return {
         success: true,
         eventId: newEventId,
-        calendarLink: \`https://calendar.google.com/calendar/event?eid=\${Buffer.from(newEventId).toString('base64')}\`, // Example link
-        message: \`Successfully created new appointment for \${input.clientName} (Placeholder).\`,
+        calendarLink: `https://calendar.google.com/calendar/event?eid=${Buffer.from(newEventId).toString('base64')}`, // Example link
+        message: `Successfully created new appointment for ${input.clientName} (Placeholder).`,
       };
     }
     
@@ -84,3 +84,4 @@ export const manageCalendarEventFlow = ai.defineFlow(
     // };
   }
 );
+
