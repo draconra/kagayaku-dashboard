@@ -3,6 +3,7 @@
 "use server";
 
 import { z } from "zod";
+import { redirect } from 'next/navigation';
 
 const LoginActionInputSchema = z.object({
   email: z.string().email("Invalid email address.").min(1, "Email is required."),
@@ -14,7 +15,7 @@ export type LoginFormData = z.infer<typeof LoginActionInputSchema>;
 export type LoginActionState = {
   formData?: LoginFormData;
   error?: string;
-  successMessage?: string;
+  // successMessage is no longer needed here if redirecting directly
 };
 
 export async function loginAction(
@@ -37,22 +38,23 @@ export async function loginAction(
 
   // Placeholder authentication logic
   // In a real application, you would verify credentials against a database or auth provider.
-  if (email === "test@example.com" && password === "password") {
-    // Simulate successful login
-    // In a real app, you would set up a session, cookies, or JWT here.
-    return {
-      successMessage: "Login successful! Redirecting...", // Placeholder, usually redirect
-    };
-  } else if (email === "user@example.com" && password === "password123") {
-     return {
-      successMessage: "Welcome back, User! Redirecting...",
-    };
-  }
-  
-  else {
+  if ((email === "test@example.com" && password === "password") || (email === "user@example.com" && password === "password123")) {
+    // Simulate successful login by redirecting
+    // In a real app, you would set up a session, cookies, or JWT here before redirecting.
+    redirect('/'); 
+    // Note: redirect will throw an error to stop execution and send the redirect,
+    // so technically no value is returned here in the success case.
+    // The Promise<LoginActionState> return type is for the error cases.
+  } else {
     return {
       formData: validatedFields.data,
       error: "Invalid email or password. Please try again.",
     };
   }
+}
+
+export async function logoutAction(): Promise<void> {
+  // In a real application, you would clear the session/cookies here.
+  // For this placeholder, we just redirect to the login page.
+  redirect('/login');
 }

@@ -1,7 +1,11 @@
 
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react"; // Changed from 'react-dom' if you were using older Next.js/React
+// For Next.js 14+ with React 18.3+, useActionState is from 'react'
+// import { useActionState } from "react"; 
+import { useEffect } from "react";
+
 import { useFormStatus } from "react-dom";
 import { loginAction, type LoginActionState } from "@/app/login/actions";
 import { Label } from "@/components/ui/label";
@@ -9,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Mail, KeyRound, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, Mail, KeyRound, AlertCircle } from "lucide-react"; // Removed CheckCircle2
 import { useToast } from "@/hooks/use-toast";
 
 const initialState: LoginActionState = {};
@@ -35,22 +39,17 @@ export function LoginForm() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (state.error && !state.successMessage) {
-      // Toast for error is optional as we also have an inline Alert
+    if (state?.error) { // Check if state exists before accessing error
+      // The error Alert component below will handle displaying the error.
+      // A toast is optional here and can be uncommented if desired.
       // toast({
       //   variant: "destructive",
       //   title: "Login Failed",
       //   description: state.error,
       // });
     }
-    if (state.successMessage) {
-      toast({
-        title: "Login Successful",
-        description: state.successMessage,
-      });
-      // In a real app, you'd redirect here, e.g., router.push('/dashboard');
-    }
-  }, [state.error, state.successMessage, toast]);
+    // Success message and redirect are now handled by the server action directly.
+  }, [state?.error, toast]);
 
   return (
     <Card className="shadow-xl">
@@ -71,7 +70,7 @@ export function LoginForm() {
                 name="email"
                 type="email"
                 placeholder="you@example.com"
-                defaultValue={state.formData?.email}
+                defaultValue={state?.formData?.email || ""}
                 className="pl-10"
                 required
               />
@@ -86,7 +85,7 @@ export function LoginForm() {
                 name="password"
                 type="password"
                 placeholder="••••••••"
-                defaultValue={state.formData?.password}
+                defaultValue={state?.formData?.password || ""}
                 className="pl-10"
                 required
               />
@@ -97,20 +96,14 @@ export function LoginForm() {
           <SubmitButton />
         </CardFooter>
       </form>
-      {state.error && !state.successMessage && (
+      {state?.error && ( // Only show error alert if there is an error
         <Alert variant="destructive" className="m-4 md:m-6 mt-0">
           <AlertCircle className="h-5 w-5" />
           <AlertTitle>Login Failed</AlertTitle>
           <AlertDescription>{state.error}</AlertDescription>
         </Alert>
       )}
-      {state.successMessage && (
-         <Alert variant="default" className="m-4 md:m-6 mt-0 border-green-500 bg-green-500/10 text-green-700 dark:text-green-400">
-          <CheckCircle2 className="h-5 w-5 text-green-500" />
-          <AlertTitle className="font-semibold text-green-600 dark:text-green-300">Login Successful</AlertTitle>
-          <AlertDescription>{state.successMessage}</AlertDescription>
-        </Alert>
-      )}
+      {/* Success Alert removed as redirect handles success indication */}
     </Card>
   );
 }

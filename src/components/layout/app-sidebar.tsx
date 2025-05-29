@@ -4,16 +4,19 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Lightbulb, CalendarPlus, AreaChart } from 'lucide-react';
+import { LayoutDashboard, Lightbulb, CalendarPlus, AreaChart, LogOut } from 'lucide-react';
 import {
   SidebarHeader,
   SidebarContent,
+  SidebarFooter,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarSeparator,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
+import { logoutAction } from '@/app/login/actions';
 
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -73,6 +76,26 @@ export function AppSidebar() {
           ))}
         </SidebarMenu>
       </SidebarContent>
+      <SidebarFooter className="p-2">
+        <SidebarSeparator className="my-1" />
+        <form action={logoutAction} className="w-full">
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              type="submit"
+              className="w-full"
+              tooltip={{ children: "Logout", side: 'right', align: 'center' }}
+              variant="ghost" // Or "default" if you prefer a more prominent look
+              // isActive={false} // Not applicable for an action button typically
+            >
+              <LogOut />
+              <span className={cn(
+                  "transition-opacity duration-200",
+                  open ? "opacity-100 delay-100" : "opacity-0 md:opacity-100 md:delay-0"
+              )}>Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </form>
+      </SidebarFooter>
     </>
   );
 }
