@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Lightbulb, CalendarPlus } from 'lucide-react'; 
+import { LayoutDashboard, Lightbulb, CalendarPlus, AreaChart } from 'lucide-react';
 import {
   SidebarHeader,
   SidebarContent,
@@ -19,6 +19,7 @@ const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/smart-pricing', label: 'Smart Pricing', icon: Lightbulb },
   { href: '/appointments/create', label: 'New Appointment', icon: CalendarPlus },
+  { href: '/financial-snapshot', label: 'Financial Snapshot', icon: AreaChart },
 ];
 
 export function AppSidebar() {
@@ -34,14 +35,14 @@ export function AppSidebar() {
             alt="Kagayaku Studio Logo"
             width={96}
             height={32}
-            className="h-8 w-auto" 
+            className="h-8 w-auto"
             data-ai-hint="studio logo"
-            priority 
+            priority
           />
           <h1
             className={cn(
               "font-semibold text-lg text-primary whitespace-nowrap transition-opacity duration-300",
-              open ? "opacity-100" : "opacity-0 md:opacity-100" 
+              open ? "opacity-100" : "opacity-0 md:opacity-100"
             )}
           >
             Kagayaku CC
@@ -57,13 +58,13 @@ export function AppSidebar() {
                   asChild
                   isActive={pathname === item.href}
                   tooltip={{ children: item.label, side: 'right', align: 'center' }}
-                  onClick={() => setOpenMobile(false)} 
+                  onClick={() => setOpenMobile(false)}
                 >
-                  <a> 
+                  <a>
                     <item.icon />
                     <span className={cn(
                        "transition-opacity duration-200",
-                       open ? "opacity-100 delay-100" : "opacity-0 md:opacity-100 md:delay-0" 
+                       open ? "opacity-100 delay-100" : "opacity-0 md:opacity-100 md:delay-0"
                     )}>{item.label}</span>
                   </a>
                 </SidebarMenuButton>
