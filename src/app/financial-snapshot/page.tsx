@@ -11,12 +11,13 @@ export default function FinancialSnapshotPage() {
           Financial Snapshot
         </h1>
         <p className="text-muted-foreground mt-2">
-          A detailed view of your studio's financial performance.
+          A detailed view of your studio's financial performance. Manage entries and filter by period.
         </p>
       </div>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto"> {/* Increased max-width for wider table */}
         <FinancialSnapshot />
       </div>
     </div>
   );
 }
+
