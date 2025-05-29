@@ -4,10 +4,11 @@
 
 import { z } from "zod";
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 const LoginActionInputSchema = z.object({
   email: z.string().email("Invalid email address.").min(1, "Email is required."),
-  password: z.string().min(6, "Password must be at least 6 characters."),
+  password: z.string().min(1, "Password is required."), // Min length 1 for simplicity here
 });
 
 export type LoginFormData = z.infer<typeof LoginActionInputSchema>;
@@ -15,8 +16,9 @@ export type LoginFormData = z.infer<typeof LoginActionInputSchema>;
 export type LoginActionState = {
   formData?: LoginFormData;
   error?: string;
-  // successMessage is no longer needed here if redirecting directly
 };
+
+const AUTH_COOKIE_NAME = 'auth_session';
 
 export async function loginAction(
   prevState: LoginActionState,
@@ -36,15 +38,20 @@ export async function loginAction(
 
   const { email, password } = validatedFields.data;
 
-  // Placeholder authentication logic
-  // In a real application, you would verify credentials against a database or auth provider.
-  if ((email === "test@example.com" && password === "password") || (email === "user@example.com" && password === "password123")) {
-    // Simulate successful login by redirecting
-    // In a real app, you would set up a session, cookies, or JWT here before redirecting.
+  // Specified credentials
+  const validEmail = "kagayakustudio2024@gmail.com";
+  const validPassword = "admin12345";
+
+  if (email === validEmail && password === validPassword) {
+    // Set a simple auth cookie
+    cookies().set(AUTH_COOKIE_NAME, 'true', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7 // 1 week
+    });
     redirect('/'); 
-    // Note: redirect will throw an error to stop execution and send the redirect,
-    // so technically no value is returned here in the success case.
-    // The Promise<LoginActionState> return type is for the error cases.
   } else {
     return {
       formData: validatedFields.data,
@@ -54,7 +61,7 @@ export async function loginAction(
 }
 
 export async function logoutAction(): Promise<void> {
-  // In a real application, you would clear the session/cookies here.
-  // For this placeholder, we just redirect to the login page.
+  // Clear the auth cookie
+  cookies().delete(AUTH_COOKIE_NAME);
   redirect('/login');
 }
