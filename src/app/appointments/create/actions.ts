@@ -2,7 +2,7 @@
 // @ts-nocheck : This is a temporary workaround for a bug in the v1.8.0 of genkit, it will be removed in the next version.
 "use server";
 
-import { manageCalendarEventFlow, type ManageCalendarEventInput, type ManageCalendarEventOutput } from "@/ai/flows/manage-calendar-event";
+import { manageCalendarEvent, type ManageCalendarEventInput, type ManageCalendarEventOutput } from "@/ai/flows/manage-calendar-event";
 import { z } from "zod";
 
 const SaveAppointmentActionInputSchema = z.object({
@@ -55,7 +55,7 @@ export async function saveAppointmentAction(
   };
 
   try {
-    const result = await manageCalendarEventFlow(flowInput);
+    const result = await manageCalendarEvent(flowInput); // Changed from manageCalendarEventFlow
     if (result.success) {
       return { 
         successMessage: result.message || "Appointment saved successfully and Google Calendar event managed.",
@@ -75,3 +75,4 @@ export async function saveAppointmentAction(
     };
   }
 }
+

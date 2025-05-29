@@ -3,7 +3,7 @@
 /**
  * @fileOverview Manages Google Calendar events for appointments.
  *
- * - manageCalendarEventFlow - Creates or updates a Google Calendar event.
+ * - manageCalendarEvent - Creates or updates a Google Calendar event.
  * - ManageCalendarEventInput - The input type for the flow.
  * - ManageCalendarEventOutput - The return type for the flow.
  */
@@ -37,7 +37,7 @@ export async function manageCalendarEvent(input: ManageCalendarEventInput): Prom
 // In a real application, this flow would use the Google Calendar API.
 // This requires setting up OAuth 2.0 authentication and using a client library like 'googleapis'.
 // The 'ai.defineFlow' would call a function that handles these API interactions.
-export const manageCalendarEventFlow = ai.defineFlow(
+const manageCalendarEventFlow = ai.defineFlow(
   {
     name: 'manageCalendarEventFlow',
     inputSchema: ManageCalendarEventInputSchema,
