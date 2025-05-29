@@ -23,7 +23,7 @@ const formatCurrency = (value: number) => {
 };
 
 export function FinancialSnapshot() {
-  return (
+  const financialSnapshotCard = (
     <Card className="shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export function FinancialSnapshot() {
               <YAxis 
                 stroke="hsl(var(--foreground))" 
                 fontSize={12} 
-                tickFormatter={(value) => \`Rp\${value/1000000}jt\`} 
+                tickFormatter={(value) => `Rp${value/1000000}jt`} 
                 label={{ value: '(in millions IDR)', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))', fontSize:10, dy: 40 }}
               />
               <Tooltip
@@ -83,4 +83,6 @@ export function FinancialSnapshot() {
       </CardContent>
     </Card>
   );
+
+  return financialSnapshotCard;
 }

@@ -2,8 +2,9 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image'; // Added Image import
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Lightbulb, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Lightbulb } from 'lucide-react'; // Removed Sparkles as it's replaced
 import {
   SidebarHeader,
   SidebarContent,
@@ -27,7 +28,15 @@ export function AppSidebar() {
     <>
       <SidebarHeader className="p-4">
         <Link href="/" className="flex items-center gap-2 hover:no-underline">
-          <Sparkles className="w-8 h-8 text-primary" />
+          <Image
+            src="https://placehold.co/96x32.png"
+            alt="Kagayaku Studio Logo"
+            width={96}
+            height={32}
+            className="h-8 w-auto" // Maintain height, auto width based on aspect ratio
+            data-ai-hint="studio logo"
+            priority // Preload logo as it's important LCP element
+          />
           <h1
             className={cn(
               "font-semibold text-lg text-primary whitespace-nowrap transition-opacity duration-300",
