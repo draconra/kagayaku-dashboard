@@ -1,7 +1,10 @@
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { CalendarDays, Clock, PlusCircle } from "lucide-react";
 
 const appointments = [
   { id: "1", clientName: "Airi Tanaka", serviceType: "Full Color Analysis", date: "2024-07-15", time: "10:00 AM", status: "Upcoming" },
@@ -13,12 +16,20 @@ const appointments = [
 export function AppointmentOverview() {
   return (
     <Card className="shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CalendarDays className="w-6 h-6 text-primary" />
-          Upcoming Appointments
-        </CardTitle>
-        <CardDescription>A quick look at your upcoming schedule.</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="w-6 h-6 text-primary" />
+            Upcoming Appointments
+          </CardTitle>
+          <CardDescription>A quick look at your upcoming schedule.</CardDescription>
+        </div>
+        <Link href="/appointments/create" passHref>
+          <Button variant="outline" size="sm">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            New Appointment
+          </Button>
+        </Link>
       </CardHeader>
       <CardContent>
         <Table>
@@ -52,6 +63,13 @@ export function AppointmentOverview() {
                 </TableCell>
               </TableRow>
             ))}
+            {appointments.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  No upcoming appointments.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </CardContent>

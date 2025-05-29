@@ -2,9 +2,9 @@
 "use client";
 
 import Link from 'next/link';
-import Image from 'next/image'; // Added Image import
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Lightbulb } from 'lucide-react'; // Removed Sparkles as it's replaced
+import { LayoutDashboard, Lightbulb, CalendarPlus } from 'lucide-react'; 
 import {
   SidebarHeader,
   SidebarContent,
@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/smart-pricing', label: 'Smart Pricing', icon: Lightbulb },
+  { href: '/appointments/create', label: 'New Appointment', icon: CalendarPlus },
 ];
 
 export function AppSidebar() {
@@ -33,9 +34,9 @@ export function AppSidebar() {
             alt="Kagayaku Studio Logo"
             width={96}
             height={32}
-            className="h-8 w-auto" // Maintain height, auto width based on aspect ratio
+            className="h-8 w-auto" 
             data-ai-hint="studio logo"
-            priority // Preload logo as it's important LCP element
+            priority 
           />
           <h1
             className={cn(
@@ -58,11 +59,11 @@ export function AppSidebar() {
                   tooltip={{ children: item.label, side: 'right', align: 'center' }}
                   onClick={() => setOpenMobile(false)} 
                 >
-                  <a> {/* Updated: Use <a> tag directly for Link compatibility */}
+                  <a> 
                     <item.icon />
                     <span className={cn(
                        "transition-opacity duration-200",
-                       open ? "opacity-100 delay-100" : "opacity-0 md:opacity-100 md:delay-0" // Better control for text visibility
+                       open ? "opacity-100 delay-100" : "opacity-0 md:opacity-100 md:delay-0" 
                     )}>{item.label}</span>
                   </a>
                 </SidebarMenuButton>
