@@ -11,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const ManageCalendarEventInputSchema = z.object({
+const ManageCalendarEventInputSchema = z.object({
   clientName: z.string().describe('The name of the client for the appointment.'),
   serviceDescription: z.string().describe('A description of the service for the appointment.'),
   dateTime: z.string().datetime().describe('The date and time of the appointment in ISO 8601 format (e.g., "2024-07-15T10:00:00").'),
@@ -20,7 +20,7 @@ export const ManageCalendarEventInputSchema = z.object({
 });
 export type ManageCalendarEventInput = z.infer<typeof ManageCalendarEventInputSchema>;
 
-export const ManageCalendarEventOutputSchema = z.object({
+const ManageCalendarEventOutputSchema = z.object({
   success: z.boolean().describe('Whether the calendar event was successfully managed.'),
   eventId: z.string().optional().describe('The ID of the created or updated Google Calendar event.'),
   calendarLink: z.string().url().optional().describe('A link to the Google Calendar event.'),
@@ -84,4 +84,3 @@ const manageCalendarEventFlow = ai.defineFlow(
     // };
   }
 );
-
