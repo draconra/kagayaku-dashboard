@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useActionState } from "react"; // Corrected: useActionState is from 'react'
-import { useFormStatus } from "react-dom"; // useFormStatus is still from react-dom
+import { useActionState } from "react"; 
+import { useFormStatus } from "react-dom"; 
 import { useEffect, useState } from "react";
 import { saveAppointmentAction, type SaveAppointmentActionState } from "./actions";
 import { Label } from "@/components/ui/label";
@@ -17,8 +17,16 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const initialState: SaveAppointmentActionState = {};
+
+const serviceOptions = [
+  "Premium Personal Color",
+  "Daily Personal Color",
+  "Express Personal Color",
+  "Group Personal Color",
+];
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -40,11 +48,11 @@ export function AppointmentForm() {
   const [state, formAction] = useActionState(saveAppointmentAction, initialState);
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    state.formData?.dateTime ? new Date(state.formData.dateTime.split('T')[0]) : undefined
+    state.formData?.dateTime ? new Date(state.formData.dateTime.split('T')[0] + 'T00:00:00') : undefined // Ensure date is parsed correctly, add T00:00:00 to avoid timezone issues with just date string
   );
 
   useEffect(() => {
-    if (state.error && !state.successMessage) { // Only show error toast if there's no success
+    if (state.error && !state.successMessage) { 
       toast({
         variant: "destructive",
         title: "Error",
@@ -57,18 +65,21 @@ export function AppointmentForm() {
         description: state.successMessage,
         variant: "default",
       });
-      // Optionally reset form or redirect here
-      setSelectedDate(undefined); // Reset date picker
-      // Consider resetting other form fields if needed by re-initializing state or using form.reset() if using react-hook-form directly
+      setSelectedDate(undefined); 
+      // Consider resetting other form fields by re-initializing state or using form.reset()
+      // For a controlled component approach (not used here directly with useActionState's form data handling),
+      // you would clear the state variables tied to each input.
+      // Since form data is largely driven by `defaultValue` from `state.formData`,
+      // a full reset would ideally mean clearing `state.formData` or resetting the action state,
+      // which useActionState doesn't directly provide a reset for in the component itself.
+      // A common pattern is to redirect or re-key the form component to force a full remount.
     }
   }, [state.error, state.successMessage, toast]);
 
-  // Correctly handle potential undefined state.formData.dateTime for splitting
   const defaultTime = state.formData?.dateTime ? state.formData.dateTime.split('T')[1] : "";
   const defaultClientName = state.formData?.clientName || "";
   const defaultServiceDescription = state.formData?.serviceDescription || "";
   const defaultNotes = state.formData?.notes || "";
-
 
   return (
     <Card className="shadow-xl">
@@ -92,13 +103,18 @@ export function AppointmentForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="serviceDescription">Service Description</Label>
-            <Input
-              id="serviceDescription"
-              name="serviceDescription"
-              placeholder="e.g., Full Color Analysis"
-              defaultValue={defaultServiceDescription}
-              required
-            />
+            <Select name="serviceDescription" defaultValue={defaultServiceDescription} required>
+              <SelectTrigger id="serviceDescription">
+                <SelectValue placeholder="Select a service" />
+              </SelectTrigger>
+              <SelectContent>
+                {serviceOptions.map((service) => (
+                  <SelectItem key={service} value={service}>
+                    {service}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
@@ -124,6 +140,7 @@ export function AppointmentForm() {
                       setSelectedDate(date);
                     }}
                     initialFocus
+                    disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))} // Disable past dates
                   />
                 </PopoverContent>
               </Popover>
